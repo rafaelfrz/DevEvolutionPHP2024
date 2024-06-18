@@ -4,11 +4,11 @@
 
 Menu de Operações CRUD com SQLite em PHP
 
-* Objetivo
+### Objetivo
 
 Criar um menu interativo no terminal para realizar operações CRUD (Create, Read, Update, Delete) em um banco de dados SQLite.
 
-* Requisitos
+### Requisitos
 
 Criar uma tabela 'produtos', com a seguinte estrutura.
 
@@ -18,7 +18,7 @@ Criar uma tabela 'produtos', com a seguinte estrutura.
 - data_criacao: TEXT, NOT NULL (armazenar datahora Y-m-d H:i:s)
 - data_atualizacao: TEXT, NULL (armazenar datahora Y-m-d H:i:s)
 
-* Funções CRUD:
+### Funções CRUD:
 
 [X] Cadastrar Produto: Inserir um novo produto no banco de dados.
 [X] Listar Todos os Produtos: Listar todos os produtos cadastrados.
@@ -27,7 +27,7 @@ Criar uma tabela 'produtos', com a seguinte estrutura.
 [X] Excluir Produto: Excluir um produto pelo ID.
 [ ] Limpar Tabela: Excluir todos os produtos da tabela. (DELETE FROM nome_da_tabela)
 
-* Menu Interativo:
+### Menu Interativo:
 
 Oferecer as opções:
 
@@ -39,19 +39,19 @@ Oferecer as opções:
 [ ] Limpar tabela de produtos
 [ ] Sair
 
-* Instruções
+### Instruções
 
 Garantir que o menu seja intuitivo.
 Tratar possíveis erros e validar entradas.
 Para desenvolver é necessário instalar o SQLite3 + a extensão para o PHP.
 
-* Referências
+### Referências
 
 https://sqlite.org/
 https://www.php.net/manual/en/sqlite3.query.php
 https://www.php.net/manual/en/sqlite3.prepare.php
 
-* Avaliação
+### Avaliação
 
 Entrega somente até o início da próxima aula (22/06 às 08h).
 
