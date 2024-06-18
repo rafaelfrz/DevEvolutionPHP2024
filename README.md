@@ -20,24 +20,24 @@ Criar uma tabela 'produtos', com a seguinte estrutura.
 
 ### Funções CRUD:
 
-[X] Cadastrar Produto: Inserir um novo produto no banco de dados.
-[X] Listar Todos os Produtos: Listar todos os produtos cadastrados.
-[X] Listar Produto por ID: Buscar um produto pelo ID e exibir seus detalhes.
-[ ] Atualizar Produto: Atualizar os dados de um produto pelo ID. (possibilidade de atualizar somente nome e preço, além da data_atualizacao)
-[X] Excluir Produto: Excluir um produto pelo ID.
-[ ] Limpar Tabela: Excluir todos os produtos da tabela. (DELETE FROM nome_da_tabela)
+- [X] Cadastrar Produto: Inserir um novo produto no banco de dados.
+- [X] Listar Todos os Produtos: Listar todos os produtos cadastrados.
+- [X] Listar Produto por ID: Buscar um produto pelo ID e exibir seus detalhes.
+- [ ] Atualizar Produto: Atualizar os dados de um produto pelo ID. (possibilidade de atualizar somente nome e preço, além da data_atualizacao)
+- [X] Excluir Produto: Excluir um produto pelo ID.
+- [ ] Limpar Tabela: Excluir todos os produtos da tabela. (DELETE FROM nome_da_tabela)
 
 ### Menu Interativo:
 
 Oferecer as opções:
 
-[X] Cadastrar um produto
-[X] Listar todos os produtos
-[X] Listar um produto pelo ID
-[ ] Atualizar um produto pelo ID
-[X] Excluir um produto pelo ID
-[ ] Limpar tabela de produtos
-[ ] Sair
+- [X] Cadastrar um produto
+- [X] Listar todos os produtos
+- [X] Listar um produto pelo ID
+- [ ] Atualizar um produto pelo ID
+- [X] Excluir um produto pelo ID
+- [ ] Limpar tabela de produtos
+- [ ] Sair
 
 ### Instruções
 
