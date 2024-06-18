@@ -1,3 +1,4 @@
+
 <?php
 
 function cadastrarProduto($db)
@@ -42,14 +43,7 @@ function listarItem($db)
     $id = readline('Informe o ID: ');
 
     echo PHP_EOL;
-    $produtoSql = $db->query('SELECT * FROM produtos WHERE id = ' . $id);
-    $produto = $produtoSql->fetchArray(SQLITE3_ASSOC);
-
-    if($produto == false) {
-        echo "ID informado não encontrado." . PHP_EOL;
-    } else {
-        echo "| {$produto['id']} | {$produto['nome']} \t| R\${$produto['preco']} \t| Criado em: {$produto['data_criacao']} |" . PHP_EOL;
-    }
+    imprimirItem($db,$id,$produto);
 
     aguardarInput();
 }
@@ -65,9 +59,29 @@ function apagarItem($db)
 function atualizarItem($db)
 {
     echo "Operação atualizar escolhida, escolha um item pelo seu ID: " . PHP_EOL;
-    listarTodos($db);
+
     $id = readline('ID: ');
-    // $atualizarSql = $db->querySingle('UPDATE')
+    imprimirItem($db,$id,$produto);
+
+    if ($produto == false) {
+      aguardarInput();
+      return;
+    }
+
+    $atualizarSql = $db->querySingle('UPDATE FROM');
+}
+
+function imprimirItem($db,$id) {
+    $produtoSql = $db->query('SELECT * FROM produtos WHERE id = ' . $id);
+    $produto = $produtoSql->fetchArray(SQLITE3_ASSOC);
+
+    if($produto == false) {
+        echo "ID informado não encontrado." . PHP_EOL;
+    } else {
+        echo "| {$produto['id']} | {$produto['nome']} \t| R\${$produto['preco']} \t| Criado em: {$produto['data_criacao']} |" . PHP_EOL;
+    }
+
+    return $produto;
 }
 
 function aguardarInput()
