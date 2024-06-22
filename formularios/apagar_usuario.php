@@ -2,8 +2,7 @@
 require 'config.php';
 
 $params = $_GET;
-$id = $params['id'];
-
+$id = (int)$params['id'];
 
 $res = $db->exec("DELETE FROM usuarios WHERE id = {$id}");
 

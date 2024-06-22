@@ -1,3 +1,10 @@
+<?php
+
+require 'config.php';
+autenticar();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,8 +20,12 @@
 			border: 1px solid black;
 		}
 	</style>
-
 </head>
+
+<?php
+echo "Seja bem vindo {$_SESSION['name']}!";
+echo "<a href=/logout.php><button>Sair</button></a>"
+?>
 
 <body>
 	<!-- CADASTRAR USUÁRIO -->
@@ -53,15 +64,12 @@
 	<!-- LISTAR USUÁRIOS -->
 	<h1>Usuários Cadastrados</h1>
 	<?php
-	require 'config.php';
-
+	
 	$usuarios = array();
 	$usuariosQuery = $db->query('SELECT * FROM usuarios');
 	while ($res = $usuariosQuery->fetchArray(SQLITE3_ASSOC)) {
 		$usuarios[] = $res;
-	} 
-	
-	{
+	} {
 		echo <<<END
 			<table>
 				<tr>
@@ -82,11 +90,16 @@
 								Apagar
 							</button>
 						</a>
+						<a href="atualizar.php?id={$usuario['id']}">
+							<button type="submit">
+								Editar
+							</button>
+						</a>
 					</td>
 				</tr>
 			END;
 		}
-		
+
 		echo '</table>';
 	}
 	?>
