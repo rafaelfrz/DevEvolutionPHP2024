@@ -12,25 +12,32 @@ function cadastrarProduto($db)
 
   echo PHP_EOL;
 
-  $stmt = $db->prepare('INSERT INTO produtos (nome, preco, data_criacao) VALUES (:nome, :preco, :data_criacao)');
+  $stmt = $db->prepare('INSERT INTO produtos (nome, preco, createdAt) VALUES (:nome, :preco, :createdAt)');
   $stmt->bindValue(':nome', $nome);
   $stmt->bindValue(':preco', $preco, SQLITE3_FLOAT);
-  $stmt->bindValue(':data_criacao', $dataCadastro);
+  $stmt->bindValue(':createdAt', $dataCadastro);
   $stmt->execute();
 
-  echo 'Produto cadastrado com sucesso!' . PHP_EOL;
+  echo 'Produto cadastrado com sucesso!' . PHP_EOL . PHP_EOL;
 
-  listarTodos($db);
+  $menu = 0;
+  listarTodos($db, $menu);
 }
 
-function listarTodos($db)
+function listarTodos($db, $menu)
 {
-  // system('clear');
+  if ($menu == 1) {
+    echo "Vizualizar todos: " . PHP_EOL . PHP_EOL;
+  }
 
-  echo "Vizualizar todos: " . PHP_EOL . PHP_EOL;
   $produtosSql = $db->query('SELECT * FROM produtos');
+
   while ($produtos = $produtosSql->fetchArray(SQLITE3_ASSOC)) {
-    echo "| {$produtos['id']} | {$produtos['nome']} \t| R\${$produtos['preco']} \t| Criado em: {$produtos['data_criacao']} |" . PHP_EOL;
+    if ($produtos['updatedAt'] != NULL || $produtos['updatedAt'] != '') {
+      echo "| {$produtos['id']} | {$produtos['nome']} \t| R\${$produtos['preco']} \t| Criado em: {$produtos['createdAt']} | Ultima atualização em: {$produtos['updatedAt']}" . PHP_EOL;
+    } else {
+      echo "| {$produtos['id']} | {$produtos['nome']} \t| R\${$produtos['preco']} \t| Criado em: {$produtos['createdAt']} |" . PHP_EOL;
+    }
   }
 
   aguardarInput();
@@ -38,11 +45,8 @@ function listarTodos($db)
 
 function listarItem($db)
 {
-  system('clear');
-
   $id = readline('Informe o ID: ');
 
-  echo PHP_EOL;
   imprimirItem($db, $id);
 
   aguardarInput();
@@ -53,7 +57,8 @@ function apagarItem($db)
   $id = readline('Informe o ID do item: ') . PHP_EOL;
   $apagarSql = $db->querySingle('DELETE FROM produtos WHERE id = ' . $id);
 
-  listarTodos($db);
+  $menu = 0;
+  listarTodos($db, $menu);
 }
 
 function atualizarItem($db)
@@ -62,13 +67,19 @@ function atualizarItem($db)
 
   $id = readline('ID: ');
   $produto = imprimirItem($db, $id);
+  $queryUpdate = 'UPDATE produtos SET';
+
+  if ($produto == false) {
+    aguardarInput();
+    return;
+  };
 
   $nomesTabelasSql = $db->query('PRAGMA table_info(produtos)');
   $dadosTabela = array();
   $nomesTabela = array();
 
   while ($res = $nomesTabelasSql->fetchArray(SQLITE3_ASSOC)) {
-    array_push($dadosTabela, $res);
+    $dadosTabela[] = $res;
   };
 
   foreach ($dadosTabela as $key => $dados) {
@@ -76,23 +87,68 @@ function atualizarItem($db)
 
     if ($dados['pk'] != '1') {
       if ($verificaNome != '1') {
-        array_push($nomesTabela, $dados['name']);
+        $nomesTabela[] = [$dados['name'], $dados['type']];
       }
     }
   }
 
+  echo PHP_EOL;
+
   foreach ($nomesTabela as $nome) {
-    $nome = readline(ucfirst($nome) . ": ") . PHP_EOL;
+    $dados = readline(ucfirst($nome[0]) . ": ");
+    if ($dados != '') {
+      if ($nome[1] == 'INTEGER' || $nome[1] == 'REAL' || $nome[1] == 'NUMERIC') {
+        $dadosNovos[$nome[0]] = (float)$dados;
+      } else {
+        $dadosNovos[$nome[0]] = $dados;
+      }
+    }
   }
 
-  var_dump($nomesTabela);
+  $ultimoDado = array_key_last($dadosNovos);
 
-  if ($produto == false) {
-    aguardarInput();
-    return;
-  };
+  foreach ($dadosNovos as $key => $dados) {
+    if ($dados != '' || $dados != null) {
+      $tipoDado = gettype($dados);
+      if ($tipoDado != 'string') {
+        $queryUpdate .= " {$key} = {$dados}";
+      } else {
+        $queryUpdate .= " {$key} = '{$dados}'";
+      }
 
-  $atualizarSql = $db->querySingle('UPDATE produtos SET nome = "",preco = {$preco} WHERE {$id}');
+      if ($key == $ultimoDado) {
+        $queryUpdate .= " WHERE id = {$id};";
+      } else if ($key != $ultimoDado) {
+        $queryUpdate .= ",";
+      }
+    }
+  }
+
+  $db->exec($queryUpdate);
+  $dataUpdate = date("Y-m-d H:i:s");
+  $db->exec("UPDATE produtos SET updatedAt = '{$dataUpdate}' WHERE id = {$id}");
+
+  aguardarInput();
+}
+
+function limparTabela($db)
+{
+  echo "Operação limpar tabela escolhida, apagando todos os dados da tabela\nCaso queira cancelar, aperte Ctrl + C" . PHP_EOL . PHP_EOL;
+
+  for ($i = 3; $i != 0; $i -= 1) {
+    echo $i;
+    sleep(1);
+    for ($j = 3; $j != 0; $j -= 1) {
+      echo ".";
+      sleep(1);
+    }
+  }
+
+  $db->exec("DELETE FROM produtos");
+
+  echo "TABELA APAGADA" . PHP_EOL;
+
+  sleep(1);
 
   aguardarInput();
 }
@@ -103,12 +159,12 @@ function imprimirItem($db, $id)
   $produto = $produtoSql->fetchArray(SQLITE3_ASSOC);
 
   if ($produto == false) {
-    echo "ID informado não encontrado." . PHP_EOL;
+    echo PHP_EOL . "ID informado não encontrado." . PHP_EOL;
+  } else if ($produto['updatedAt'] != NULL || $produto['updatedAt'] != '') {
+    echo "| {$produto['id']} | {$produto['nome']} \t| R\${$produto['preco']} \t| Criado em: {$produto['createdAt']} | Ultima atualização em: {$produto['updatedAt']}" . PHP_EOL;
   } else {
-    echo "| {$produto['id']} | {$produto['nome']} \t| R\${$produto['preco']} \t| Criado em: {$produto['data_criacao']} |" . PHP_EOL;
+    echo "| {$produto['id']} | {$produto['nome']} \t| R\${$produto['preco']} \t| Criado em: {$produto['createdAt']} |" . PHP_EOL;
   }
-
-  // aguardarInput();
 
   return $produto;
 }
@@ -126,7 +182,10 @@ $operacoes = [
   2 => ['operacao' => 'Visualizar cadastro produto'],
   3 => ['operacao' => 'Atualizar cadastro produto'],
   4 => ['operacao' => 'Apagar cadastro do produto'],
+  5 => ['operacao' => 'Limpar tabela'],
 ];
+
+$menu = 1;
 
 while (true) {
   system('clear');
@@ -136,6 +195,8 @@ while (true) {
   foreach ($operacoes as $key => $operacao) {
     echo "[{$key}] - {$operacao['operacao']}" . PHP_EOL;
   }
+
+  echo PHP_EOL . "[e] - Sair" . PHP_EOL;
 
   echo PHP_EOL;
 
@@ -151,8 +212,7 @@ while (true) {
       cadastrarProduto($db);
       break;
     case 1:
-      system('clear');
-      listarTodos($db);
+      listarTodos($db, $menu);
       break;
     case 2:
       listarItem($db);
@@ -163,5 +223,10 @@ while (true) {
     case 4:
       apagarItem($db);
       break;
+    case 5:
+      limparTabela($db);
+      break;
+    case 'e';
+      exit;
   }
 }
